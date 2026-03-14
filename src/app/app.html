@@ -1,6 +1,6 @@
 <div class="page">
   <h1>Optymalizator zdjęć</h1>
-  <p class="subtitle">Zmniejsz wagę pliku JPG bez utraty jakości wizualnej</p>
+  <p class="subtitle">Zmniejsz wagę plików JPG i PNG bez utraty jakości wizualnej</p>
 
   <!-- Strefa wrzucania -->
   <div
@@ -12,13 +12,13 @@
     (click)="fileInput.click()"
   >
     <div class="icon">🖼️</div>
-    <p><span>Kliknij aby wybrać</span> lub przeciągnij zdjęcie tutaj</p>
-    <p class="hint">Obsługuje JPG, JPEG i PNG</p>
+    <p><span>Kliknij aby wybrać</span> lub przeciągnij zdjęcia tutaj</p>
+    <p class="hint">Obsługuje JPG, JPEG i PNG — możesz wrzucić wiele plików naraz</p>
   </div>
-  <input #fileInput type="file" accept=".jpg,.jpeg,.png" (change)="onFileSelected($event)" hidden />
+  <input #fileInput type="file" accept=".jpg,.jpeg,.png" multiple (change)="onFileSelected($event)" hidden />
 
-  <!-- Suwak jakości -->
   @if (isReady) {
+    <!-- Suwak jakości -->
     <div class="controls glass">
       <label>
         Jakość kompresji
@@ -33,22 +33,29 @@
       />
     </div>
 
-    <!-- Podgląd -->
-    <div class="preview-section glass">
-      <div class="preview-grid">
-        <div class="preview-box">
-          <p>Oryginał</p>
-          <img [src]="originalDataURL" alt="Oryginał" />
-          <span class="size-badge">Rozmiar: <strong>{{ originalSize }}</strong></span>
-        </div>
-        <div class="preview-box">
-          <p>Po kompresji</p>
-          <img [src]="compressedDataURL" alt="Skompresowane" />
-          <span class="size-badge">Rozmiar: <strong>{{ compressedSize }}</strong></span>
+    <!-- Lista zdjęć -->
+    <div class="images-list glass">
+      <div class="list-header">
+        <span>{{ images.length }} {{ images.length === 1 ? 'plik' : 'pliki/plików' }}</span>
+        <div class="header-actions">
+          <button class="btn-secondary" (click)="clearAll()">Wyczyść</button>
+          <button class="btn-primary" (click)="downloadAll()">Pobierz wszystkie</button>
         </div>
       </div>
-      <p class="saving">{{ savingInfo }}</p>
-      <button (click)="download()">Pobierz skompresowane zdjęcie</button>
+
+      @for (item of images; track item.file.name) {
+        <div class="image-row">
+          <img [src]="item.compressedDataURL || item.originalDataURL" alt="{{ item.file.name }}" />
+          <div class="image-info">
+            <p class="filename">{{ item.file.name }}</p>
+            <p class="sizes">{{ item.originalSize }} → <strong>{{ item.compressedSize }}</strong></p>
+            @if (item.saving > 0) {
+              <p class="saving">−{{ item.saving }}%</p>
+            }
+          </div>
+          <button class="btn-download" (click)="download(item)">↓</button>
+        </div>
+      }
     </div>
   }
 </div>

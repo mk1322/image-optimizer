@@ -2,6 +2,15 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
+interface ImageItem {
+  file: File;
+  originalDataURL: string;
+  compressedDataURL: string;
+  originalSize: string;
+  compressedSize: string;
+  saving: number;
+}
+
 @Component({
   selector: 'app-root',
   imports: [FormsModule, CommonModule],
@@ -9,16 +18,13 @@ import { CommonModule } from '@angular/common';
   styleUrl: './app.css'
 })
 export class App {
-  originalFile: File | null = null;
-  originalDataURL: string = '';
-  compressedDataURL: string = '';
-  originalSize: string = '';
-  compressedSize: string = '';
-  savingInfo: string = '';
+  images: ImageItem[] = [];
   quality: number = 80;
   isDragOver: boolean = false;
-  isReady: boolean = false;
-  mimeType: string = 'image/jpeg';
+
+  get isReady(): boolean {
+    return this.images.length > 0;
+  }
 
   onDragOver(event: DragEvent) {
     event.preventDefault();
@@ -32,40 +38,41 @@ export class App {
   onDrop(event: DragEvent) {
     event.preventDefault();
     this.isDragOver = false;
-    const file = event.dataTransfer?.files[0];
-    if (file) this.handleFile(file);
+    const files = event.dataTransfer?.files;
+    if (files) this.handleFiles(files);
   }
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (file) this.handleFile(file);
+    if (input.files) this.handleFiles(input.files);
   }
 
-  handleFile(file: File) {
-    if (!file.type.match('image/jpeg') && !file.type.match('image/png')) {
-      alert('Proszę wybrać plik JPG, JPEG lub PNG.');
-      return;
-    }
+  handleFiles(files: FileList) {
+    Array.from(files).forEach(file => {
+      if (!file.type.match('image/jpeg') && !file.type.match('image/png')) return;
 
-    this.originalFile = file;
-    this.mimeType = file.type;
-    this.originalSize = this.formatSize(file.size);
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      this.originalDataURL = e.target?.result as string;
-      this.isReady = true;
-      this.compress();
-    };
-    reader.readAsDataURL(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const item: ImageItem = {
+          file,
+          originalDataURL: e.target?.result as string,
+          compressedDataURL: '',
+          originalSize: this.formatSize(file.size),
+          compressedSize: '',
+          saving: 0
+        };
+        this.images.push(item);
+        this.compressItem(item);
+      };
+      reader.readAsDataURL(file);
+    });
   }
 
   onQualityChange() {
-    if (this.originalDataURL) this.compress();
+    this.images.forEach(item => this.compressItem(item));
   }
 
-  compress() {
+  compressItem(item: ImageItem) {
     const img = new Image();
     img.onload = () => {
       const canvas = document.createElement('canvas');
@@ -75,25 +82,29 @@ export class App {
       ctx.drawImage(img, 0, 0);
 
       const quality = this.quality / 100;
-      this.compressedDataURL = canvas.toDataURL(this.mimeType, quality);
+      item.compressedDataURL = canvas.toDataURL(item.file.type, quality);
 
-      const base64 = this.compressedDataURL.split(',')[1];
+      const base64 = item.compressedDataURL.split(',')[1];
       const compressedBytes = Math.round((base64.length * 3) / 4);
-      this.compressedSize = this.formatSize(compressedBytes);
-
-      const saved = Math.round((1 - compressedBytes / this.originalFile!.size) * 100);
-      this.savingInfo = saved > 0
-        ? `Oszczędność: ${saved}% mniej miejsca`
-        : 'Spróbuj obniżyć jakość aby zmniejszyć rozmiar';
+      item.compressedSize = this.formatSize(compressedBytes);
+      item.saving = Math.round((1 - compressedBytes / item.file.size) * 100);
     };
-    img.src = this.originalDataURL;
+    img.src = item.originalDataURL;
   }
 
-  download() {
+  download(item: ImageItem) {
     const a = document.createElement('a');
-    a.href = this.compressedDataURL;
-    a.download = 'compressed_' + (this.originalFile?.name || 'image.jpg');
+    a.href = item.compressedDataURL;
+    a.download = 'compressed_' + item.file.name;
     a.click();
+  }
+
+  downloadAll() {
+    this.images.forEach(item => this.download(item));
+  }
+
+  clearAll() {
+    this.images = [];
   }
 
   formatSize(bytes: number): string {
