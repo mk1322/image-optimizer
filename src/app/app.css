@@ -1,0 +1,252 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.page {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #0a0a0f;
+  color: #e8e8f0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 64px 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Tło — rozmyte kolorowe plamy */
+.page::before,
+.page::after {
+  content: '';
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.18;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page::before {
+  width: 600px;
+  height: 600px;
+  background: #5b2fff;
+  top: -200px;
+  left: -200px;
+}
+
+.page::after {
+  width: 500px;
+  height: 500px;
+  background: #ff2f7a;
+  bottom: -150px;
+  right: -150px;
+}
+
+.page > * {
+  position: relative;
+  z-index: 1;
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #ffffff 0%, #a0a0c0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  color: #666680;
+  margin-bottom: 48px;
+  font-size: 15px;
+}
+
+/* Efekt szkła — wspólna baza */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+}
+
+/* Strefa wrzucania */
+.drop-zone {
+  width: 100%;
+  max-width: 580px;
+  padding: 56px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.25s, background 0.25s, transform 0.2s;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1.5px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+}
+
+.drop-zone:hover {
+  background: rgba(91, 47, 255, 0.1);
+  border-color: rgba(91, 47, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.drop-zone.dragover {
+  background: rgba(91, 47, 255, 0.15);
+  border-color: rgba(91, 47, 255, 0.7);
+  border-style: solid;
+  transform: translateY(-2px);
+}
+
+.drop-zone .icon {
+  font-size: 44px;
+  margin-bottom: 16px;
+  filter: drop-shadow(0 0 12px rgba(91, 47, 255, 0.4));
+}
+
+.drop-zone p {
+  color: #8888a8;
+  font-size: 15px;
+}
+
+.drop-zone p span {
+  color: #9b7fff;
+  font-weight: 600;
+}
+
+.drop-zone .hint {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #44445a;
+}
+
+/* Suwak */
+.controls {
+  width: 100%;
+  max-width: 580px;
+  margin-top: 20px;
+  padding: 24px 28px;
+}
+
+.controls label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 500;
+  color: #8888a8;
+  margin-bottom: 12px;
+}
+
+.controls label span {
+  color: #c0c0e0;
+  font-weight: 600;
+}
+
+.controls input[type="range"] {
+  width: 100%;
+  height: 4px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  outline: none;
+}
+
+.controls input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7b5fff, #ff5fa0);
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(123, 95, 255, 0.5);
+}
+
+/* Podgląd */
+.preview-section {
+  width: 100%;
+  max-width: 580px;
+  margin-top: 20px;
+  padding: 28px;
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.preview-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.preview-box p {
+  font-size: 12px;
+  font-weight: 600;
+  color: #55556a;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.preview-box img {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  object-fit: cover;
+  aspect-ratio: 1;
+}
+
+.size-badge {
+  font-size: 13px;
+  color: #55556a;
+}
+
+.size-badge strong {
+  color: #c0c0e0;
+}
+
+.saving {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #4fffb0, #00c8ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Przycisk */
+button {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #7b5fff 0%, #ff5fa0 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 24px rgba(123, 95, 255, 0.35);
+  letter-spacing: 0.02em;
+}
+
+button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 32px rgba(123, 95, 255, 0.45);
+}
+
+button:active {
+  transform: translateY(0);
+}

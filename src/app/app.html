@@ -1,0 +1,54 @@
+<div class="page">
+  <h1>Optymalizator zdjęć</h1>
+  <p class="subtitle">Zmniejsz wagę pliku JPG bez utraty jakości wizualnej</p>
+
+  <!-- Strefa wrzucania -->
+  <div
+    class="drop-zone"
+    [class.dragover]="isDragOver"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave()"
+    (drop)="onDrop($event)"
+    (click)="fileInput.click()"
+  >
+    <div class="icon">🖼️</div>
+    <p><span>Kliknij aby wybrać</span> lub przeciągnij zdjęcie tutaj</p>
+    <p class="hint">Obsługuje JPG, JPEG i PNG</p>
+  </div>
+  <input #fileInput type="file" accept=".jpg,.jpeg,.png" (change)="onFileSelected($event)" hidden />
+
+  <!-- Suwak jakości -->
+  @if (isReady) {
+    <div class="controls glass">
+      <label>
+        Jakość kompresji
+        <span>{{ quality }}%</span>
+      </label>
+      <input
+        type="range"
+        min="10"
+        max="100"
+        [(ngModel)]="quality"
+        (ngModelChange)="onQualityChange()"
+      />
+    </div>
+
+    <!-- Podgląd -->
+    <div class="preview-section glass">
+      <div class="preview-grid">
+        <div class="preview-box">
+          <p>Oryginał</p>
+          <img [src]="originalDataURL" alt="Oryginał" />
+          <span class="size-badge">Rozmiar: <strong>{{ originalSize }}</strong></span>
+        </div>
+        <div class="preview-box">
+          <p>Po kompresji</p>
+          <img [src]="compressedDataURL" alt="Skompresowane" />
+          <span class="size-badge">Rozmiar: <strong>{{ compressedSize }}</strong></span>
+        </div>
+      </div>
+      <p class="saving">{{ savingInfo }}</p>
+      <button (click)="download()">Pobierz skompresowane zdjęcie</button>
+    </div>
+  }
+</div>
